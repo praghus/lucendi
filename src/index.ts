@@ -1,1 +1,1 @@
-export * from './lib/vector';
+export * from './lib/models/vector'

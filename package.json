@@ -1,7 +1,7 @@
 {
   "name": "lucendi",
   "version": "1.0.0",
-  "description": "lucendi",
+  "description": "lucendi - Line of sight",
   "main": "build/main/index.js",
   "typings": "build/main/index.d.ts",
   "module": "build/module/index.js",
@@ -14,8 +14,7 @@
     "build:main": "tsc -p tsconfig.json",
     "build:module": "tsc -p tsconfig.module.json",
     "fix": "run-s fix:*",
-    "fix:prettier": "prettier \"src/**/*.ts\" --write",
-    "fix:tslint": "tslint --fix --project .",
+    "fix:eslint": "eslint src/** --fix",
     "test": "run-s build test:*",
     "test:lint": "tslint --project . && prettier \"src/**/*.ts\" --list-different",
     "test:unit": "nyc --silent ava",
