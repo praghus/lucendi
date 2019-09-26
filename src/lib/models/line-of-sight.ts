@@ -13,7 +13,6 @@ export default class LineOfSight  {
         this.objects = options.objects || []
     }
 
-    // create buffer
     createCache (width: number, height: number) {
         this._cache = createCanvasBuffer('lc', width, height)
         this._ccache = createCanvasBuffer('lcc', width, height)
@@ -29,19 +28,17 @@ export default class LineOfSight  {
         c.ctx.clearRect(0, 0, c.width, c.height)
         c.ctx.fillStyle = getBlackAlpha(Math.round(100 / n) / 100)
         light.forEachSample((position) => {
-            // todo: map
-            for (let o = 0; o < objects.length; ++o) {
-                if (objects[o].contains(position)) {
+            objects.map((object) => {
+                if (object.contains(position)) {
                     c.ctx.fillRect(
                         bounds.topleft.x, 
                         bounds.topleft.y, 
                         bounds.bottomright.x - bounds.topleft.x, 
                         bounds.bottomright.y - bounds.topleft.y
                     )
-                    return
                 }
-            }
-            objects.map((object) => object.cast(ctx, position, bounds))
+                object.cast(ctx, position, bounds)
+            })
         })
 
         objects.map((object) => {

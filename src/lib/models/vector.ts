@@ -1,11 +1,8 @@
 export default class Vector {
-    public x: number
-    public y: number
-
-    constructor (x = 0, y = 0) {
-        this.x = x
-        this.y = y
-    }
+    constructor (
+        public x: number = 0, 
+        public y: number = 0
+    ) {}
 
     add (v: Vector): Vector {
         return new Vector(this.x + v.x, this.y + v.y)

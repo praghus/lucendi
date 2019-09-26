@@ -44,7 +44,11 @@ interface Light {
     samples: number;
     angle: number;
     roughness: number;
+    bounds(): Bounds;
+    center(): Vector;
+    forEachSample(callback: (data: any) => void): void;
     mask(ctx: CanvasRenderingContext2D): void;
+    render(): void;
 }
 
 interface Shape {    

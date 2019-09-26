@@ -1,6 +1,4 @@
 
-import Vector from './models/vector'
-
 export const noop = Function.prototype
 
 export const createBuffer = (): CanvasRenderingContext2D => document.createElement('canvas').getContext('2d')
@@ -23,11 +21,10 @@ export function path (
     }
 }
 
-// consider using only createBuffer
 export function createCanvasBuffer (
     uid: string, 
-    width: number, // remove
-    height: number // remove
+    width: number,
+    height: number
 ): CanvasBuffer {
     let canvas = document.getElementById(uid) as HTMLCanvasElement
     if (canvas === null) {
@@ -49,11 +46,8 @@ export function createCanvasBuffer (
 }
 
 export const getRGBA = (function () {
-    const canvas = document.createElement('canvas')
-    canvas.width = canvas.height = 1
-    const ctx = canvas.getContext('2d')
-
-    return function (color: string, alpha: number) {
+    const ctx = createBuffer()
+    return (color: string, alpha: number) => {
         ctx.clearRect(0, 0, 1, 1)
         ctx.fillStyle = color
         ctx.fillRect(0, 0, 1, 1)

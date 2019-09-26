@@ -8,12 +8,39 @@ export default class PolygonObject {
         this.points = options.points || []
     }
     
+    _forEachVisibleEdges (
+        origin: Vector, 
+        bounds: Bounds, 
+        callback: (
+            a: Vector, 
+            b: Vector, 
+            originToA: Vector, 
+            originToB: Vector, 
+            aToB: Vector
+        ) => void
+    ) {
+        let a: Vector = this.points[this.points.length - 1]
+        let b: Vector        
+        for (let p = 0; p < this.points.length; ++p, a = b) {
+            b = this.points[p]
+            if (a.inBound(bounds.topleft, bounds.bottomright)) {
+                const originToA = a.sub(origin)
+                const originToB = b.sub(origin)
+                const aToB = b.sub(a)
+                const normal = new Vector(aToB.y, -aToB.x)
+                if (normal.dot(originToA) < 0) {
+                    callback(a, b, originToA, originToB, aToB)
+                }
+            }
+        }
+    }    
+    
     cast (ctx: CanvasRenderingContext2D, origin: Vector, bounds: Bounds): void {
         const distance = (
             (bounds.bottomright.x - bounds.topleft.x) + 
             (bounds.bottomright.y - bounds.topleft.y)
         ) / 2
-        // @todo: fixme
+
         this._forEachVisibleEdges(origin, bounds, (
             a: Vector, 
             b: Vector, 
@@ -22,7 +49,7 @@ export default class PolygonObject {
             aToB: Vector
         ) => {
             const t = originToA.inv().dot(aToB) / aToB.length2()
-            let m // m is the projected point of origin to [a, b]
+            let m: Vector // m is the projected point of origin to [a, b]
             if (t < 0) {
                 m = a
             }
@@ -51,13 +78,12 @@ export default class PolygonObject {
     bounds (): Bounds {
         const topleft = this.points[0].copy()
         const bottomright = topleft.copy()
-        for (let p = 1; p < this.points.length; ++p) {
-            const point = this.points[p]
-            if (point.x > bottomright.x) bottomright.x = point.x 
-            if (point.y > bottomright.y) bottomright.y = point.y 
-            if (point.x < topleft.x) topleft.x = point.x 
-            if (point.y < topleft.y) topleft.y = point.y 
-        }
+        this.points.map((p: Vector): void => {
+            if (p.x > bottomright.x) bottomright.x = p.x 
+            if (p.y > bottomright.y) bottomright.y = p.y 
+            if (p.x < topleft.x) topleft.x = p.x 
+            if (p.y < topleft.y) topleft.y = p.y 
+        })
         return { 
             topleft: topleft, 
             bottomright: bottomright 
@@ -66,20 +92,19 @@ export default class PolygonObject {
 
     contains (point: Vector): boolean {
         const points = this.points
-        const x = point.x 
-        const y = point.y
+        const { x, y } = point
+        
         let j = points.length - 1
         let oddNodes = false
      
-        // @todo: fixme
         for (let i = 0; i < points.length; i++) {
+            const [p1, p2] = [points[i], points[j]]
             if (
-                (points[i].y < y && points[j].y >= y || points[j].y < y && points[i].y >= y) && 
-                (points[i].x <= x || points[j].x <= x)
+                (p1.y < y && p2.y >= y || p2.y < y && p1.y >= y) && 
+                (p1.x <= x || p2.x <= x) &&
+                (p1.x + (y - p1.y) / (p2.y - p1.y) * (p2.x - p1.x) < x)
             ) {
-                if (points[i].x + (y - points[i].y) / (points[j].y - points[i].y) * (points[j].x - points[i].x) < x) {
-                    oddNodes = !oddNodes 
-                }
+                oddNodes = !oddNodes 
             }
             j = i 
         }
@@ -89,21 +114,4 @@ export default class PolygonObject {
     path (ctx: CanvasRenderingContext2D): void {
         path(ctx, this.points)
     }    
-
-    _forEachVisibleEdges (origin, bounds, f) {
-        let a = this.points[this.points.length - 1]
-        let b
-        for (let p = 0; p < this.points.length; ++p, a = b) {
-            b = this.points[p]
-            if (a.inBound(bounds.topleft, bounds.bottomright)) {
-                const originToA = a.sub(origin)
-                const originToB = b.sub(origin)
-                const aToB = b.sub(a)
-                const normal = new Vector(aToB.y, -aToB.x)
-                if (normal.dot(originToA) < 0) {
-                    f(a, b, originToA, originToB, aToB)
-                }
-            }
-        }
-    }
 }
