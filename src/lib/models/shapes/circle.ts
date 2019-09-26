@@ -18,9 +18,10 @@ export default class DiscObject {
         let originToB = tangentLines[1]
         const a = originToA.add(origin)
         const b = originToB.add(origin)
-    
-        // normalize to distance
-        const distance = ((bounds.bottomright.x - bounds.topleft.x) + (bounds.bottomright.y - bounds.topleft.y)) / 2
+        const distance = (
+            (bounds.bottomright.x - bounds.topleft.x) + 
+            (bounds.bottomright.y - bounds.topleft.y)
+        ) / 2
         
         originToM = originToM.normalize().mul(distance)
         originToA = originToA.normalize().mul(distance)
@@ -65,12 +66,11 @@ export default class DiscObject {
         if (typeof a === 'object' && typeof center === 'number') { 
             const tmp = a 
             center = a
-            center = tmp // swap
+            center = tmp
         }
 
         let soln: Vector
 
-        // t = +/- Math.acos( (-a*x0 +/- y0 * Math.sqrt(x0*x0 + y0*y0 - a*a))/(x0*x0 + y0*y) );
         const len2a = y0 * Math.sqrt(len2 - a * a)
         const tt = Math.acos((-a * x0 + len2a) / len2)
         const nt = Math.acos((-a * x0 - len2a) / len2)
@@ -79,9 +79,6 @@ export default class DiscObject {
         const ntCos = a * Math.cos(nt)
         const ntSin = a * Math.sin(nt)
         
-        // Note: cos(-t) == cos(t) and sin(-t) == -sin(t) for all t, so find
-        // x0 + a*cos(t), y0 +/- a*sin(t)
-        // Solutions have equal lengths
         soln = new Vector(x0 + ntCos, y0 + ntSin)
         solutions.push(soln)
         const dist0 = soln.length2()
@@ -94,7 +91,7 @@ export default class DiscObject {
         soln = new Vector(x0 + ntCos, y0 - ntSin)
         solutions.push(soln)
         const dist2 = soln.length2()
-        // Changed order so no strange X of light inside the circle. Could also sort results.
+
         if (Math.abs(dist1 - dist2) < epsilon) return [soln, solutions[1]] 
         if (Math.abs(dist0 - dist2) < epsilon) return [solutions[0], soln]
         
@@ -105,7 +102,6 @@ export default class DiscObject {
         if (Math.abs(dist1 - dist3) < epsilon) return [solutions[1], soln]
         if (Math.abs(dist0 - dist3) < epsilon) return [solutions[0], soln]
         
-        // return all 4 solutions if no matching vector lengths found.
         return solutions
     }
 }

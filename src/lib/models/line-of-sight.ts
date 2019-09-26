@@ -19,8 +19,7 @@ export default class LineOfSight  {
     }
 
     cast  (ctx: CanvasRenderingContext2D): void {
-        const light = this.light
-        const objects = this.objects
+        const { light, objects } = this
         const n = light.samples
         const c = this._ccache
         const bounds = light.bounds()
@@ -57,7 +56,7 @@ export default class LineOfSight  {
         if (!this._cache || this._cache.width !== width || this._cache.height !== height) { 
             this.createCache(width, height) 
         }
-        const ctx = this._cache.ctx
+        const { ctx } = this._cache
         ctx.save()
         ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height)
         this.light.render(ctx)

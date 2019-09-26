@@ -16,7 +16,7 @@ export default class ShadowCaster {
         if (!this._cache || this._cache.width !== width || this._cache.height !== height) { 
             this._cache = createCanvasBuffer('dm', width, height)
         }
-        const ctx = this._cache.ctx
+        const { ctx } = this._cache
         ctx.save()
         ctx.clearRect(0, 0, width, height)
         ctx.fillStyle = this.color

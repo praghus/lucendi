@@ -48,27 +48,24 @@ export default class PolygonObject {
             originToB: Vector, 
             aToB: Vector
         ) => {
+            let m: Vector 
             const t = originToA.inv().dot(aToB) / aToB.length2()
-            let m: Vector // m is the projected point of origin to [a, b]
-            if (t < 0) {
-                m = a
-            }
-            else if (t > 1) {
-                m = b
-            }
-            else {
-                m = a.add(aToB.mul(t)) 
-            }
+            
+            if (t < 0) m = a            
+            else if (t > 1) m = b
+            else m = a.add(aToB.mul(t)) 
+            
             let originToM = m.sub(origin)
-            // normalize to distance
+
             originToM = originToM.normalize().mul(distance)
             originToA = originToA.normalize().mul(distance)
             originToB = originToB.normalize().mul(distance)
-            // project points
+
             const oam = a.add(originToM)
             const obm = b.add(originToM)
             const ap = a.add(originToA)
             const bp = b.add(originToB)
+
             ctx.beginPath()
             path(ctx, [a, b, bp, obm, oam, ap])
             ctx.fill()
