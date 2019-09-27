@@ -1,7 +1,7 @@
 import { createCanvasBuffer } from '../helpers'
 import { COLOR } from '../constants'
 
-export default class ShadowCaster {
+export default class Dark {
     private _cache: CanvasBuffer
 
     public lights: Array<Light> 

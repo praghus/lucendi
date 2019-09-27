@@ -1,16 +1,18 @@
-import Vector from '../vector'
+import Point from './point'
 import { path } from '../../helpers'
 
-export default class DiscObject {
-    public center: Vector
+export default class Circle {
+    public center: Point
+    public diffuse: number
     public radius: number
 
     constructor (options?: StringTMap<any>) {
-        this.center = options.center || new Vector(),
+        this.center = options.center || new Point(),
         this.radius = options.radius || 20
+        this.diffuse = options.diffuse || 0.8
     }
 
-    cast (ctx: CanvasRenderingContext2D, origin: Vector, bounds: Bounds): void {
+    cast (ctx: CanvasRenderingContext2D, origin: Point, bounds: Bounds): void {
         const m = this.center
         let originToM = m.sub(origin)
         const tangentLines = this.getTan2(this.radius, originToM)
@@ -19,13 +21,13 @@ export default class DiscObject {
         const a = originToA.add(origin)
         const b = originToB.add(origin)
         const distance = (
-            (bounds.bottomright.x - bounds.topleft.x) + 
-            (bounds.bottomright.y - bounds.topleft.y)
+            (bounds.p2.x - bounds.p1.x) + 
+            (bounds.p2.y - bounds.p1.y)
         ) / 2
         
-        originToM = originToM.normalize().mul(distance)
-        originToA = originToA.normalize().mul(distance)
-        originToB = originToB.normalize().mul(distance)
+        originToM = originToM.norm().mul(distance)
+        originToA = originToA.norm().mul(distance)
+        originToB = originToB.norm().mul(distance)
         
         // project points
         const oam = a.add(originToM)
@@ -35,7 +37,7 @@ export default class DiscObject {
     
         const start = Math.atan2(originToM.x, -originToM.y)
         ctx.beginPath()
-        path(ctx, [b, bp, obm, oam, ap, a], true)
+        path(ctx, [b, bp, obm, oam, ap, a], false)
         ctx.arc(m.x, m.y, this.radius, start, start + Math.PI)
         ctx.fill()
     }
@@ -46,21 +48,21 @@ export default class DiscObject {
 
     bounds (): Bounds { 
         return { 
-            topleft: new Vector(this.center.x - this.radius, this.center.y - this.radius),
-            bottomright: new Vector(this.center.x + this.radius, this.center.y + this.radius)
+            p1: new Point(this.center.x - this.radius, this.center.y - this.radius),
+            p2: new Point(this.center.x + this.radius, this.center.y + this.radius)
         } 
     }
 
-    contains (point: Vector): boolean { 
+    contains (point: Point): boolean { 
         return point.dist2(this.center) < this.radius * this.radius
     }
 
-    getTan2 (radius: number, center: Vector): Array<Vector> {
+    getTan2 (radius: number, center: Point): Array<Point> {
         const epsilon = 1e-6
         const a = radius
         const x0 = center.x
         const y0 = center.y
-        const len2 = center.length2()        
+        const len2 = center.len2()        
         const solutions = []             
         
         if (typeof a === 'object' && typeof center === 'number') { 
@@ -69,7 +71,7 @@ export default class DiscObject {
             center = tmp
         }
 
-        let soln: Vector
+        let soln: Point
 
         const len2a = y0 * Math.sqrt(len2 - a * a)
         const tt = Math.acos((-a * x0 + len2a) / len2)
@@ -79,26 +81,27 @@ export default class DiscObject {
         const ntCos = a * Math.cos(nt)
         const ntSin = a * Math.sin(nt)
         
-        soln = new Vector(x0 + ntCos, y0 + ntSin)
+        soln = new Point(x0 + ntCos, y0 + ntSin)
         solutions.push(soln)
-        const dist0 = soln.length2()
+        const dist0 = soln.len2()
         
-        soln = new Vector(x0 + ttCos, y0 - ttSin)
+        soln = new Point(x0 + ttCos, y0 - ttSin)
         solutions.push(soln)
-        const dist1 = soln.length2()
+        const dist1 = soln.len2()
         if (Math.abs(dist0 - dist1) < epsilon) return solutions
         
-        soln = new Vector(x0 + ntCos, y0 - ntSin)
+        soln = new Point(x0 + ntCos, y0 - ntSin)
         solutions.push(soln)
-        const dist2 = soln.length2()
+        const dist = soln.len2()
 
-        if (Math.abs(dist1 - dist2) < epsilon) return [soln, solutions[1]] 
-        if (Math.abs(dist0 - dist2) < epsilon) return [solutions[0], soln]
+        if (Math.abs(dist1 - dist) < epsilon) return [soln, solutions[1]] 
+        if (Math.abs(dist0 - dist) < epsilon) return [solutions[0], soln]
         
-        soln = new Vector(x0 + ttCos, y0 + ttSin)
+        soln = new Point(x0 + ttCos, y0 + ttSin)
         solutions.push(soln)
-        const dist3 = soln.length2()
-        if (Math.abs(dist2 - dist3) < epsilon) return [solutions[2], soln]
+        const dist3 = soln.len2()
+
+        if (Math.abs(dist - dist3) < epsilon) return [solutions[2], soln]
         if (Math.abs(dist1 - dist3) < epsilon) return [solutions[1], soln]
         if (Math.abs(dist0 - dist3) < epsilon) return [solutions[0], soln]
         

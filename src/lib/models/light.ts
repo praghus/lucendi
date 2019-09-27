@@ -1,4 +1,4 @@
-import Vector from './vector'
+import Point from './boundaries/point'
 import { COLOR } from '../constants'
 import { getUID, getRGBA, createCanvasBuffer } from '../helpers'
 
@@ -15,12 +15,12 @@ export default class Light {
     public radius: number
     public samples: number
     public angle: number
-    public position: Vector
+    public position: Point
     public roughness: number
 
     constructor (options?: StringTMap<any>) {
         this.id = getUID()
-        this.position = options.position || new Vector()
+        this.position = options.position || new Point()
         this.distance = options.distance || 100
         this.diffuse = options.diffuse || 0.8
         this.color = options.color || COLOR.LIGHT
@@ -52,7 +52,7 @@ export default class Light {
         return this._vcache
     }
 
-    _getGradientCache (center: Vector): CanvasBuffer {
+    _getGradientCache (center: Point): CanvasBuffer {
         const hash = this._getHashCache()
         if (this._gHash !== hash) {
             const d = Math.round(this.distance)
@@ -71,23 +71,23 @@ export default class Light {
         return this._gcache
     }
 
-    center (): Vector {
-        return new Vector(
+    center (): Point {
+        return new Point(
             (1 - Math.cos(this.angle) * this.roughness) * this.distance,
             (1 + Math.sin(this.angle) * this.roughness) * this.distance
         )
     }
 
-    orientationCenter (): Vector {
-        return new Vector(Math.cos(this.angle), -Math.sin(this.angle)).mul(this.roughness * this.distance)
+    orientationCenter (): Point {
+        return new Point(Math.cos(this.angle), -Math.sin(this.angle)).mul(this.roughness * this.distance)
     }
 
     bounds (): Bounds {
         const { x, y } = this.orientationCenter()
         const { distance, position } = this
         return {
-            topleft: new Vector(position.x + x - distance, position.y + y - distance),
-            bottomright: new Vector(position.x + x + distance, position.y + y + distance)
+            p1: new Point(position.x + x - distance, position.y + y - distance),
+            p2: new Point(position.x + x + distance, position.y + y + distance)
         }
     }
 
@@ -113,7 +113,7 @@ export default class Light {
         for (let s = 0; s < this.samples; ++s) {
             const a = s * (Math.PI * (3 - Math.sqrt(5)))
             const r = Math.sqrt(s / this.samples) * this.radius
-            const delta = new Vector(Math.cos(a) * r, Math.sin(a) * r)
+            const delta = new Point(Math.cos(a) * r, Math.sin(a) * r)
             callback(this.position.add(delta))
         }
     }

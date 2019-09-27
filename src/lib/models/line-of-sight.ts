@@ -6,7 +6,7 @@ export default class LineOfSight  {
     private _ccache: CanvasBuffer
 
     public light: Light
-    public objects: Array<Shape>
+    public objects: Array<Shape> // @todo: rename to boundaries
 
     constructor (options?: StringTMap<any>) {
         this.light = options.light || new Light()
@@ -30,10 +30,10 @@ export default class LineOfSight  {
             objects.map((object) => {
                 if (object.contains(position)) {
                     c.ctx.fillRect(
-                        bounds.topleft.x, 
-                        bounds.topleft.y, 
-                        bounds.bottomright.x - bounds.topleft.x, 
-                        bounds.bottomright.y - bounds.topleft.y
+                        bounds.p1.x, 
+                        bounds.p1.y, 
+                        bounds.p2.x - bounds.p1.x, 
+                        bounds.p2.y - bounds.p1.y
                     )
                 }
                 object.cast(ctx, position, bounds)
@@ -41,9 +41,8 @@ export default class LineOfSight  {
         })
 
         objects.map((object) => {
-            let diffuse = object.diffuse === undefined ? 0.8 : object.diffuse
-            diffuse *= light.diffuse
-            c.ctx.fillStyle = getBlackAlpha(1 - diffuse)
+            object.diffuse *= light.diffuse
+            c.ctx.fillStyle = getBlackAlpha(1 - object.diffuse)
             c.ctx.beginPath()
             object.path(c.ctx)
             c.ctx.fill()

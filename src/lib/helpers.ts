@@ -9,16 +9,13 @@ export const getBlackAlpha = (alpha: number): string => `rgba(0,0,0,${alpha})`
 
 export function path (
     ctx: CanvasRenderingContext2D, 
-    points: Array<Vector>, 
-    dontJoinLast?: boolean
+    points: Array<Point>, 
+    join = true
 ): void {
-    let p = points[0]
+    const p = points[0]
     ctx.moveTo(p.x, p.y)
     points.forEach(({x, y}) => ctx.lineTo(x, y))
-    if (!dontJoinLast && points.length > 2) {
-        p = points[0]
-        ctx.lineTo(p.x, p.y)
-    }
+    join && ctx.lineTo(p.x, p.y)
 }
 
 export function createCanvasBuffer (

@@ -14,29 +14,29 @@ interface CanvasBuffer {
 }
 
 interface Bounds {
-    topleft: Vector;
-    bottomright: Vector;
+    p1: Point;
+    p2: Point;
 }
 
-interface Vector {
+interface Point {
     x: number;
     y: number;
-    add(v: Vector): Vector;
-    copy(): Vector;
-    dist2(v: Vector): number;
-    dot(v: Vector): number;
-    inBound(topleft: Vector, bottomright: Vector): boolean;
-    inv(): Vector;
-    length2(): number;
-    mul(n: number): Vector;
-    normalize(): Vector;
-    sub(v: Vector): Vector;
+    add(p: Point): Point;
+    clone(): Point;
+    dist2(p: Point): number;
+    dot(p: Point): number;
+    inBound(p1: Point, p2: Point): boolean;
+    inv(): Point;
+    len2(): number;
+    mul(n: number): Point;
+    norm(): Point;
+    sub(p: Point): Point;
 }
 
 interface Light {
     id: string;
-    position: Vector;
-    centerPos: Vector;
+    position: Point;
+    centerPos: Point;
     diffuse: number;
     distance: number;
     color: string;
@@ -45,18 +45,18 @@ interface Light {
     angle: number;
     roughness: number;
     bounds(): Bounds;
-    center(): Vector;
+    center(): Point;
     forEachSample(callback: (data: any) => void): void;
     mask(ctx: CanvasRenderingContext2D): void;
     render(): void;
 }
 
 interface Shape {    
-    center?: Vector;
+    center?: Point;
     diffuse?: number;
-    points?: Array<Vector>;
+    points?: Array<Point>;
     radius?: number;
-    cast(ctx: CanvasRenderingContext2D, position: Vector, bounds: Bounds): void;
-    contains(point: Vector): boolean;
+    cast(ctx: CanvasRenderingContext2D, position: Point, bounds: Bounds): void;
+    contains(point: Point): boolean;
     path(ctx: CanvasRenderingContext2D): void;
 }
