@@ -1,5 +1,6 @@
-import Point from './point'
+import { StringTMap, Bounds } from 'lucendi'
 import { path } from '../../helpers'
+import Point from './point'
 
 export default class Circle {
     public center: Point
@@ -57,7 +58,7 @@ export default class Circle {
         return point.dist2(this.center) < this.radius * this.radius
     }
 
-    getTan2 (radius: number, center: Point): Array<Point> {
+    getTan2 (radius: number, center: Point): Point[] {
         const epsilon = 1e-6
         const a = radius
         const x0 = center.x

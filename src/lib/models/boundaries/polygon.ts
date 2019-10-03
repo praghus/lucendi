@@ -1,5 +1,6 @@
-import Point from './point'
+import { StringTMap, Bounds } from 'lucendi'
 import { path } from '../../helpers'
+import Point from './point'
 
 export default class Polygon {
     public points: Array<Point>

@@ -1,25 +1,26 @@
-import Light from './light'
+import { CanvasBuffer, Shape, StringTMap } from 'lucendi'
 import { createCanvasBuffer, getBlackAlpha } from '../helpers'
+import Light from './light'
 
 export default class LineOfSight  {
     private _cache: CanvasBuffer
     private _ccache: CanvasBuffer
 
     public light: Light
-    public objects: Array<Shape> // @todo: rename to boundaries
-
+    public lightmask: Shape[] 
+    
     constructor (options?: StringTMap<any>) {
         this.light = options.light || new Light()
-        this.objects = options.objects || []
+        this.lightmask = options.lightmask || []
     }
 
-    createCache (width: number, height: number) {
+    createCache (width: number, height: number): void {
         this._cache = createCanvasBuffer('lc', width, height)
         this._ccache = createCanvasBuffer('lcc', width, height)
     }
 
-    cast  (ctx: CanvasRenderingContext2D): void {
-        const { light, objects } = this
+    cast (ctx: CanvasRenderingContext2D): void {
+        const { light, lightmask } = this
         const n = light.samples
         const c = this._ccache
         const bounds = light.bounds()
@@ -27,7 +28,7 @@ export default class LineOfSight  {
         c.ctx.clearRect(0, 0, c.width, c.height)
         c.ctx.fillStyle = getBlackAlpha(Math.round(100 / n) / 100)
         light.forEachSample((position) => {
-            objects.map((object) => {
+            lightmask.map((object) => {
                 if (object.contains(position)) {
                     c.ctx.fillRect(
                         bounds.p1.x, 
@@ -40,7 +41,7 @@ export default class LineOfSight  {
             })
         })
 
-        objects.map((object) => {
+        lightmask.map((object) => {
             object.diffuse *= light.diffuse
             c.ctx.fillStyle = getBlackAlpha(1 - object.diffuse)
             c.ctx.beginPath()

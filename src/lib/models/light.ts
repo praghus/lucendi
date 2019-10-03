@@ -1,6 +1,7 @@
-import Point from './boundaries/point'
-import { COLOR } from '../constants'
+import { CanvasBuffer, StringTMap, Bounds } from 'lucendi'
 import { getUID, getRGBA, createCanvasBuffer } from '../helpers'
+import { COLOR } from '../constants'
+import Point from './boundaries/point'
 
 export default class Light {
     private _gcache: CanvasBuffer
@@ -30,11 +31,11 @@ export default class Light {
         this.roughness = options.roughness || 0
     }
 
-    _getHashCache (): string {
+    private _getHashCache (): string {
         return [this.color, this.distance, this.diffuse, this.angle].toString()
     }
 
-    _getVisibleMaskCache (): CanvasBuffer {
+    private _getVisibleMaskCache (): CanvasBuffer {
         const d = Math.floor(this.distance * 1.4)
         const hash = `${d}`
         if (this._vHash !== hash) {
@@ -52,7 +53,7 @@ export default class Light {
         return this._vcache
     }
 
-    _getGradientCache (center: Point): CanvasBuffer {
+    private _getGradientCache (center: Point): CanvasBuffer {
         const hash = this._getHashCache()
         if (this._gHash !== hash) {
             const d = Math.round(this.distance)

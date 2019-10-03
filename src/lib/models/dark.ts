@@ -1,3 +1,4 @@
+import { CanvasBuffer, Light, StringTMap } from 'lucendi'
 import { createCanvasBuffer } from '../helpers'
 import { COLOR } from '../constants'
 

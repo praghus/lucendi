@@ -1,3 +1,4 @@
+import { Point, CanvasBuffer } from 'lucendi'
 
 export const noop = Function.prototype
 

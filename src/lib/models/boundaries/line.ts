@@ -1,3 +1,4 @@
+import { Bounds } from 'lucendi'
 import Point from './point'
 import Polygon from './polygon'
 
