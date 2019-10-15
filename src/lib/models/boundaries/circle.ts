@@ -1,17 +1,12 @@
-import { StringTMap, Bounds } from 'lucendi'
+import { Bounds } from 'lucendi'
 import { path } from '../../helpers'
 import Point from './point'
 
 export default class Circle {
-    public center: Point
-    public diffuse: number
-    public radius: number
-
-    constructor (options?: StringTMap<any>) {
-        this.center = options.center || new Point(),
-        this.radius = options.radius || 20
-        this.diffuse = options.diffuse || 0.8
-    }
+    constructor (
+        public center: Point,
+        public radius: number
+    ) {}
 
     cast (ctx: CanvasRenderingContext2D, origin: Point, bounds: Bounds): void {
         const m = this.center
@@ -22,8 +17,8 @@ export default class Circle {
         const a = originToA.add(origin)
         const b = originToB.add(origin)
         const distance = (
-            (bounds.p2.x - bounds.p1.x) + 
-            (bounds.p2.y - bounds.p1.y)
+            (bounds.b.x - bounds.a.x) + 
+            (bounds.b.y - bounds.a.y)
         ) / 2
         
         originToM = originToM.norm().mul(distance)
@@ -49,8 +44,8 @@ export default class Circle {
 
     bounds (): Bounds { 
         return { 
-            p1: new Point(this.center.x - this.radius, this.center.y - this.radius),
-            p2: new Point(this.center.x + this.radius, this.center.y + this.radius)
+            a: new Point(this.center.x - this.radius, this.center.y - this.radius),
+            b: new Point(this.center.x + this.radius, this.center.y + this.radius)
         } 
     }
 

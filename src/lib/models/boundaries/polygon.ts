@@ -1,15 +1,11 @@
-import { StringTMap, Bounds } from 'lucendi'
+import { Bounds } from 'lucendi'
 import { path } from '../../helpers'
 import Point from './point'
 
 export default class Polygon {
-    public points: Array<Point>
-    public diffuse: number
-
-    constructor (options?: StringTMap<any>) {
-        this.diffuse = options.diffuse || 0.8
-        this.points = options.points || []
-    }
+    constructor (
+        public points: Point[] = []
+    ) {}
 
     _forEachVisibleEdges (
         origin: Point,
@@ -26,7 +22,7 @@ export default class Polygon {
         let b: Point
         for (let p = 0; p < this.points.length; ++p, a = b) {
             b = this.points[p]
-            if (a.inBound(bounds.p1, bounds.p2)) {
+            if (a.inBound(bounds.a, bounds.b)) {
                 const originToA = a.sub(origin)
                 const originToB = b.sub(origin)
                 const aToB = b.sub(a)
@@ -40,8 +36,8 @@ export default class Polygon {
 
     cast (ctx: CanvasRenderingContext2D, origin: Point, bounds: Bounds): void {
         const distance = (
-            (bounds.p2.x - bounds.p1.x) +
-            (bounds.p2.y - bounds.p1.y)
+            (bounds.b.x - bounds.a.x) +
+            (bounds.b.y - bounds.a.y)
         ) / 2
 
         this._forEachVisibleEdges(origin, bounds, (
@@ -76,15 +72,15 @@ export default class Polygon {
     }
 
     bounds (): Bounds {
-        const p1 = this.points[0].clone()
-        const p2 = p1.clone()
+        const a = this.points[0].clone()
+        const b = a.clone()
         this.points.map((p: Point): void => {
-            if (p.x > p2.x) p2.x = p.x
-            if (p.y > p2.y) p2.y = p.y
-            if (p.x < p1.x) p1.x = p.x
-            if (p.y < p1.y) p1.y = p.y
+            if (p.x > b.x) b.x = p.x
+            if (p.y > b.y) b.y = p.y
+            if (p.x < a.x) a.x = p.x
+            if (p.y < a.y) a.y = p.y
         })
-        return { p1, p2 }
+        return { a, b }
     }
 
     contains (point: Point): boolean {
@@ -95,11 +91,11 @@ export default class Polygon {
         let oddNodes = false
 
         for (let i = 0; i < points.length; i++) {
-            const [p1, p2] = [points[i], points[j]]
+            const [a, b] = [points[i], points[j]]
             if (
-                (p1.y < y && p2.y >= y || p2.y < y && p1.y >= y) &&
-                (p1.x <= x || p2.x <= x) &&
-                (p1.x + (y - p1.y) / (p2.y - p1.y) * (p2.x - p1.x) < x)
+                (a.y < y && b.y >= y || b.y < y && a.y >= y) &&
+                (a.x <= x || b.x <= x) &&
+                (a.x + (y - a.y) / (b.y - a.y) * (b.x - a.x) < x)
             ) {
                 oddNodes = !oddNodes
             }

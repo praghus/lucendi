@@ -13,8 +13,8 @@ export default class Line extends Polygon {
 
     bounds (): Bounds {
         return { 
-            p1: this.a, 
-            p2: this.b 
+            a: this.a, 
+            b: this.b 
         }
     }
 }

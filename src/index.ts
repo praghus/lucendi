@@ -1,4 +1,4 @@
-export { default as Dark } from './lib/models/dark'
+export { default as DarkMask } from './lib/models/dark-mask'
 export { default as Light } from './lib/models/light'
 export { default as LineOfSight } from './lib/models/line-of-sight'
 export { default as Box } from './lib/models/boundaries/box'

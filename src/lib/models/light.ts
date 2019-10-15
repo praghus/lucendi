@@ -12,7 +12,6 @@ export default class Light {
     public id: string
     public color: string
     public distance: number
-    public diffuse: number
     public radius: number
     public samples: number
     public angle: number
@@ -20,10 +19,9 @@ export default class Light {
     public roughness: number
 
     constructor (options?: StringTMap<any>) {
-        this.id = getUID()
+        this.id = options.id || getUID()
         this.position = options.position || new Point()
         this.distance = options.distance || 100
-        this.diffuse = options.diffuse || 0.8
         this.color = options.color || COLOR.LIGHT
         this.radius = options.radius || 0
         this.samples = options.samples || 1
@@ -32,14 +30,14 @@ export default class Light {
     }
 
     private _getHashCache (): string {
-        return [this.color, this.distance, this.diffuse, this.angle].toString()
+        return [this.color, this.distance, this.angle].toString()
     }
 
     private _getVisibleMaskCache (): CanvasBuffer {
         const d = Math.floor(this.distance * 1.4)
         const hash = `${d}`
         if (this._vHash !== hash) {
-            const c = createCanvasBuffer('vm' + this.id, 2 * d, 2 * d)
+            const c = createCanvasBuffer('mask_' + this.id, 2 * d, 2 * d)
             const g = c.ctx.createRadialGradient(d, d, 0, d, d, d)
 
             g.addColorStop(0, COLOR.BLACK1)
@@ -58,7 +56,7 @@ export default class Light {
         if (this._gHash !== hash) {
             const d = Math.round(this.distance)
             const D = d * 2
-            const c = createCanvasBuffer('gc' + this.id, D, D)
+            const c = createCanvasBuffer('gradient_' + this.id, D, D)
             const g = c.ctx.createRadialGradient(center.x, center.y, 0, d, d, d)
 
             g.addColorStop(Math.min(1, this.radius / this.distance), this.color)
@@ -87,8 +85,8 @@ export default class Light {
         const { x, y } = this.orientationCenter()
         const { distance, position } = this
         return {
-            p1: new Point(position.x + x - distance, position.y + y - distance),
-            p2: new Point(position.x + x + distance, position.y + y + distance)
+            a: new Point(position.x + x - distance, position.y + y - distance),
+            b: new Point(position.x + x + distance, position.y + y + distance)
         }
     }
 
@@ -99,6 +97,11 @@ export default class Light {
             Math.round(this.position.x + x - c.width / 2), 
             Math.round(this.position.y + y - c.height / 2)
         )
+    }
+
+    move (x: number, y: number): void {
+        this.position.x = x
+        this.position.y = y
     }
 
     render (ctx: CanvasRenderingContext2D): void {

@@ -15,13 +15,12 @@ declare namespace Lucendi {
     }
 
     export interface Bounds {
-        p1: Point;
-        p2: Point;
+        a: Point;
+        b: Point;
     }
     
     export interface Shape {
         center?: Point;
-        diffuse?: number;
         points?: Array<Point>;
         radius?: number;
         cast(ctx: CanvasRenderingContext2D, position: Point, bounds: Bounds): void;
@@ -39,7 +38,7 @@ declare namespace Lucendi {
         clone(): Point;
         dist2(p: Point): number;
         dot(p: Point): number;
-        inBound(p1: Point, p2: Point): boolean;
+        inBound(a: Point, b: Point): boolean;
         inv(): Point;
         len2(): number;
         mul(n: number): Point;
@@ -48,10 +47,9 @@ declare namespace Lucendi {
     }
 
     export class Polygon {
-        points: Array<Point>;
-        diffuse: number;
+        points: Point[];
     
-        constructor(options?: StringTMap<any>);
+        constructor(points: Point[]);
 
         bounds(): Bounds;
         cast(ctx: CanvasRenderingContext2D, position: Point, bounds: Bounds): void;
@@ -68,10 +66,9 @@ declare namespace Lucendi {
 
     export class Circle {
         center: Point;
-        diffuse: number;
         radius: number;
     
-        constructor(options?: StringTMap<any>);
+        constructor(center: Point, radius: number);
 
         bounds(): Bounds;
         cast(ctx: CanvasRenderingContext2D, position: Point, bounds: Bounds): void;
@@ -80,21 +77,19 @@ declare namespace Lucendi {
         getTan2 (radius: number, center: Point): Point[];
     }
 
-    export class Dark {
-        lights: Array<Light>;
+    export class DarkMask {
+        lights: Light[];
         color: string;
 
-        constructor(options?: StringTMap<any>);
+        constructor(lights: Light[], color: string);
 
-        calculate(width: number, height: number): void;
-        render(ctx: CanvasRenderingContext2D): void;
+        render(ctx: CanvasRenderingContext2D, width: number, height: number): void;
     }
 
     export class Light {
         id: string;
         position: Point;
         centerPos: Point;
-        diffuse: number;
         distance: number;
         color: string;
         radius: number;
@@ -108,20 +103,20 @@ declare namespace Lucendi {
         center(): Point;
         forEachSample(callback: (data: any) => void): void;
         mask(ctx: CanvasRenderingContext2D): void;
+        move(x: number, y: number): void;
         orientationCenter(): Point;
         render(): void;
     }
 
     export class LineOfSight {
         light: Light;
-        lightmask: Shape[];
+        boundaries: Shape[];
 
-        constructor(options?: StringTMap<any>);
+        constructor(light: Light, boundaries: Shape[]);
 
-        calculate(width: number, height: number): void;
         cast(ctx: CanvasRenderingContext2D): void;
         createCache(width: number, height: number): void;
-        render(ctx: CanvasRenderingContext2D): void;
+        render(ctx: CanvasRenderingContext2D, width: number, height: number): void;
     }
 }
 

@@ -1,19 +1,16 @@
-import { CanvasBuffer, Light, StringTMap } from 'lucendi'
+import { CanvasBuffer, Light } from 'lucendi'
 import { createCanvasBuffer } from '../helpers'
 import { COLOR } from '../constants'
 
-export default class Dark {
+export default class DarkMask {
     private _cache: CanvasBuffer
 
-    public lights: Array<Light> 
-    public color: string
+    constructor (
+        public lights: Light[], 
+        public color: string = COLOR.BLACK1    
+    ) {}
 
-    constructor (options?: StringTMap<any>) {
-        this.color = options.color || COLOR.BLACK1
-        this.lights = options.lights || []
-    }
-
-    calculate (width: number, height: number): void {
+    buffer (width: number, height: number): void {
         if (!this._cache || this._cache.width !== width || this._cache.height !== height) { 
             this._cache = createCanvasBuffer('dm', width, height)
         }
@@ -23,7 +20,9 @@ export default class Dark {
         ctx.fillStyle = this.color
         ctx.fillRect(0, 0, width, height)
         ctx.globalCompositeOperation = 'destination-out'
-        this.lights.map((light) => light.mask(ctx))
+        for (const light of this.lights) {
+            light.mask(ctx)
+        }
         ctx.restore()
     }
 
