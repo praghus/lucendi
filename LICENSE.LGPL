@@ -1,12 +1,6 @@
                    GNU LESSER GENERAL PUBLIC LICENSE
                        Version 3, 29 June 2007
-                       
-Illuminated.js - A 2D lights and shadows rendering engine for HTML5 applications and games.
 
-Copyright (C) 2012 Gaëtan Renaudeau <renaudeau.gaetan@gmail.com>
-http://greweb.fr/illuminated.js/
-
-----------------------------------------------------------------------------
  Copyright (C) 2007 Free Software Foundation, Inc. <http://fsf.org/>
  Everyone is permitted to copy and distribute verbatim copies
  of this license document, but changing it is not allowed.
